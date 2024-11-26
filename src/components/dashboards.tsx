@@ -13,14 +13,14 @@ import {
 } from '@mui/material';
 import { LogOut, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
-import { logout } from '../store/slices/authSlice';
+import { logout } from '../store/slices/auth-slice';
 import {
   setUsers,
   addUser,
   updateUser,
   deleteUser,
   setLoading,
-} from '../store/slices/userSlice';
+} from '../store/slices/user-slice';
 import { auth, db } from '../firebase/config';
 import { signOut, createUserWithEmailAndPassword } from 'firebase/auth';
 import {
@@ -34,8 +34,8 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import type { RootState } from '../store/store';
-import UserModal from '../components/UserModal';
-import UserTable from '../components/UserTable';
+import UserModal from './user-modal';
+import UserTable from './user-table';
 
 const Dashboard = () => {
   const navigate = useNavigate();

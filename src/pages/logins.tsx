@@ -5,7 +5,7 @@ import { Box, Paper, Typography, TextField, Button, Grid } from '@mui/material';
 import { toast } from 'sonner';
 import { loginSchema } from '../validation/schema';
 import { useDispatch } from 'react-redux';
-import { setUser, setToken } from '../store/slices/authSlice';
+import { setUser, setToken } from '../store/slices/auth-slice';
 import { auth } from '../firebase/config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { CheckCircle } from 'lucide-react';

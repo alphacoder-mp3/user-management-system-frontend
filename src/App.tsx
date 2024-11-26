@@ -4,9 +4,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { theme } from './theme';
 import { store } from './store/store';
-import Login from './pages/Login';
-import Dashboard from './components/Dashboard';
-import ProtectedRoute from './components/ProtectedRoutes';
+import Login from './pages/logins';
+import Dashboard from './components/dashboards';
+import ProtectedRoute from './components/protected-routes';
 
 function App() {
   return (

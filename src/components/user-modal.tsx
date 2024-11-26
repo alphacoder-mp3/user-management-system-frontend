@@ -6,7 +6,7 @@ import {
   Box,
 } from '@mui/material';
 import { X } from 'lucide-react';
-import UserForm from './UserForm';
+import UserForm from './user-form';
 
 interface UserModalProps {
   open: boolean;
