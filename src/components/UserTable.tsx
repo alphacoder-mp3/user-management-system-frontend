@@ -8,13 +8,16 @@ import {
   Paper,
   IconButton,
   Typography,
+  Box,
 } from '@mui/material';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit2, Trash2 } from 'lucide-react';
 
 interface User {
   id: string;
   firstName: string;
+  lastName: string;
   username: string;
+  email: string;
 }
 
 interface UserTableProps {
@@ -26,34 +29,60 @@ interface UserTableProps {
 const UserTable = ({ users, onEdit, onDelete }: UserTableProps) => {
   if (users.length === 0) {
     return (
-      <Typography variant="body1" sx={{ textAlign: 'center', py: 4 }}>
-        No users found
-      </Typography>
+      <Box
+        sx={{
+          textAlign: 'center',
+          py: 8,
+          bgcolor: 'background.paper',
+          borderRadius: 1,
+        }}
+      >
+        <Typography variant="body1" color="text.secondary">
+          No users found. Add your first user to get started.
+        </Typography>
+      </Box>
     );
   }
 
   return (
-    <TableContainer component={Paper} sx={{ mt: 3 }}>
+    <TableContainer
+      component={Paper}
+      elevation={0}
+      sx={{
+        borderRadius: 2,
+        '& .MuiTableCell-root': {
+          borderBottom: '1px solid rgba(224, 224, 224, 0.4)',
+        },
+      }}
+    >
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>First Name</TableCell>
-            <TableCell>Username</TableCell>
-            <TableCell align="right">Actions</TableCell>
+            <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
+            <TableCell sx={{ fontWeight: 600 }}>Username</TableCell>
+            <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
+            <TableCell align="right" sx={{ fontWeight: 600 }}>
+              Actions
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {users.map(user => (
-            <TableRow key={user.id}>
-              <TableCell>{user.firstName}</TableCell>
+            <TableRow
+              key={user.id}
+              sx={{ '&:hover': { bgcolor: 'action.hover' } }}
+            >
+              <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
               <TableCell>{user.username}</TableCell>
+              <TableCell>{user.email}</TableCell>
               <TableCell align="right">
                 <IconButton
                   onClick={() => onEdit(user)}
                   color="primary"
                   size="small"
+                  sx={{ mr: 1 }}
                 >
-                  <Edit size={18} />
+                  <Edit2 size={18} />
                 </IconButton>
                 <IconButton
                   onClick={() => onDelete(user.id)}
