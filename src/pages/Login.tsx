@@ -31,7 +31,7 @@ const Login = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
-        `${data.username}@example.com`,
+        `${data.username}`,
         data.password
       );
       const token = await userCredential.user.getIdToken();
@@ -122,7 +122,7 @@ const Login = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Username"
+                label="Email"
                 {...register('username')}
                 error={!!errors.username}
                 helperText={errors.username?.message}

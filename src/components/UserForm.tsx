@@ -61,7 +61,7 @@ const UserForm = ({ onSubmit, initialValues, isEdit }: UserFormProps) => {
         <Grid item xs={12}>
           <TextField
             fullWidth
-            label="Username"
+            label="Email"
             {...register('username')}
             error={!!errors.username}
             helperText={errors.username?.message}
