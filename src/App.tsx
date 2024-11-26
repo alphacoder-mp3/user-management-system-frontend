@@ -4,8 +4,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { theme } from './theme';
 import { store } from './store/store';
-import Login from './pages/logins';
-import Dashboard from './components/dashboards';
+import Login from './pages/login';
+import Dashboard from './components/dashboard';
 import ProtectedRoute from './components/protected-routes';
 
 function App() {
