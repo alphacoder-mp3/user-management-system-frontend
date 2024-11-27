@@ -1,21 +1,40 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigate } from 'react-router-dom';
-import { Box, Paper, Typography, TextField, Button, Grid } from '@mui/material';
-import { toast } from 'sonner';
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Grid,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
 import { loginSchema } from '../validation/schema';
 import { useDispatch } from 'react-redux';
 import { setUser, setToken } from '../store/slices/auth-slice';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { apiRequest } from '../utils/api';
 
 interface LoginInputs {
   email: string;
   password: string;
 }
 
+interface LoginResponse {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  token: string;
+}
+
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -26,38 +45,28 @@ const Login = () => {
   });
 
   const onSubmit = async (data: LoginInputs) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/auth`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: data.email,
-            password: data.password,
-          }),
-        }
-      );
+    const { data: user, error } = await apiRequest<LoginResponse>('/api/auth', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      requiresAuth: false,
+    });
 
-      if (!response.ok) {
-        toast.error('Invalid credentials');
-      }
+    if (error || !user) return;
 
-      const user = await response.json();
-      dispatch(
-        setUser({
-          uid: user.id,
-          email: user.email,
-          displayName: `${user.firstName} ${user.lastName}`,
-        })
-      );
-      dispatch(setToken(user.token)); // Ensure your backend sends a token
-      navigate('/dashboard');
-    } catch (error) {
-      toast.error((error as Error).message);
-    }
+    dispatch(
+      setUser({
+        uid: user.id,
+        email: user.email,
+        displayName: `${user.firstName} ${user.lastName}`,
+      })
+    );
+    dispatch(setToken(user.token));
+    // localStorage.setItem('token', user.token);
+    navigate('/dashboard');
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -139,11 +148,28 @@ const Login = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 label="Password"
                 {...register('password')}
                 error={!!errors.password}
                 helperText={errors.password?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={togglePasswordVisibility}
+                        edge="end"
+                      >
+                        {showPassword ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Grid>
             <Grid item xs={12}>
