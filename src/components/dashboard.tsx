@@ -40,11 +40,14 @@ const Dashboard = () => {
     const fetchUsers = async () => {
       try {
         dispatch(setLoading(true));
-        const response = await fetch('http://localhost:3000/api/users', {
-          headers: {
-            Authorization: `Bearer ${token}`, // Add token to headers
-          },
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/users`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Add token to headers
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error('Failed to fetch users');
@@ -74,16 +77,20 @@ const Dashboard = () => {
   };
 
   const handleAddUser = async (data: UserModalData) => {
+    // `${import.meta.env.VITE_API_BASE_URL}
     try {
       dispatch(setLoading(true));
-      const response = await fetch('http://localhost:3000/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/users`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to add user');
@@ -106,7 +113,7 @@ const Dashboard = () => {
     try {
       dispatch(setLoading(true));
       const response = await fetch(
-        `http://localhost:3000/api/users/${selectedUser.id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/users/${selectedUser.id}`,
         {
           method: 'PUT',
           headers: {
@@ -136,13 +143,16 @@ const Dashboard = () => {
   const handleDeleteUser = async (id: string) => {
     try {
       dispatch(setLoading(true));
-      const response = await fetch(`http://localhost:3000/api/users/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/users/${id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
