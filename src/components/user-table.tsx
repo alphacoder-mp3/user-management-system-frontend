@@ -16,7 +16,6 @@ interface User {
   id: string;
   firstName: string;
   lastName: string;
-  username: string;
   email: string;
 }
 
@@ -60,7 +59,6 @@ const UserTable = ({ users, onEdit, onDelete }: UserTableProps) => {
           <TableRow>
             <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
             <TableCell sx={{ fontWeight: 600 }}>Username</TableCell>
-            <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
             <TableCell align="right" sx={{ fontWeight: 600 }}>
               Actions
             </TableCell>
@@ -73,7 +71,6 @@ const UserTable = ({ users, onEdit, onDelete }: UserTableProps) => {
               sx={{ '&:hover': { bgcolor: 'action.hover' } }}
             >
               <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
-              <TableCell>{user.username}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell align="right">
                 <IconButton

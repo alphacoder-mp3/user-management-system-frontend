@@ -7,7 +7,7 @@ interface UserFormInputs {
   firstName: string;
   middleName?: string;
   lastName: string;
-  username: string;
+  email: string;
   password: string;
   confirmPassword: string;
 }
@@ -62,9 +62,9 @@ const UserForm = ({ onSubmit, initialValues, isEdit }: UserFormProps) => {
           <TextField
             fullWidth
             label="Email"
-            {...register('username')}
-            error={!!errors.username}
-            helperText={errors.username?.message}
+            {...register('email')}
+            error={!!errors.email}
+            helperText={errors.email?.message}
           />
         </Grid>
         {!isEdit && (
