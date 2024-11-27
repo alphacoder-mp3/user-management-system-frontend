@@ -16,7 +16,7 @@ export const loginSchema = yup.object().shape({
 
 export const userSchema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
-  middleName: yup.string(),
+  middleName: yup.string().optional(),
   lastName: yup.string().required('Last name is required'),
   email: yup
     .string()
@@ -31,4 +31,14 @@ export const userSchema = yup.object().shape({
     .string()
     .oneOf([yup.ref('password')], 'Passwords must match')
     .required('Confirm password is required'),
+});
+
+export const userEditSchema = yup.object().shape({
+  firstName: yup.string().required('First name is required'),
+  middleName: yup.string().optional(),
+  lastName: yup.string().required('Last name is required'),
+  email: yup
+    .string()
+    .max(20, 'Email must not exceed 20 characters')
+    .required('Email is required'),
 });
