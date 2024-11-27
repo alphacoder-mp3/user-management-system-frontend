@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -27,6 +27,8 @@ import {
 import type { RootState } from '../store/store';
 import UserModal from './user-modal';
 import UserTable from './user-table';
+import ConfirmDialog from './confirm-dialog';
+import { apiRequest } from '../utils/api';
 import { User, UserModalData } from '../types';
 
 const Dashboard = () => {
@@ -40,73 +42,60 @@ const Dashboard = () => {
   const [selectedUser, setSelectedUser] = useState<UserModalData | undefined>(
     undefined
   );
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    open: boolean;
+    userId: string | null;
+  }>({
+    open: false,
+    userId: null,
+  });
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      dispatch(setLoading(true));
+      const { data, error } = await apiRequest<User[]>(
+        '/api/users',
+        undefined,
+        token as string
+      );
+
+      if (error) return;
+      if (data) dispatch(setUsers(data));
+    } finally {
+      dispatch(setLoading(false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        dispatch(setLoading(true));
-        const response = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/users`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          toast.error('Failed to fetch users');
-        }
-
-        const data: User[] = await response.json();
-        dispatch(setUsers(data));
-      } catch (error) {
-        toast.error((error as Error).message || 'Failed to fetch users');
-      } finally {
-        dispatch(setLoading(false));
-      }
-    };
-
     if (token) {
       fetchUsers();
     }
-  }, [dispatch, token]);
+  }, [fetchUsers, token]);
 
-  const handleLogout = async () => {
-    try {
-      dispatch(logout());
-      navigate('/');
-    } catch (error) {
-      toast.error((error as Error).message || 'Failed to logout');
-    }
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/');
   };
 
   const handleAddUser = async (data: UserModalData) => {
     try {
       dispatch(setCreateLoading(true));
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/users`,
+      const { data: newUser, error } = await apiRequest<User>(
+        '/api/users',
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify(data),
-        }
+        },
+        token as string
       );
 
-      if (!response.ok) {
-        toast.error('Failed to add user');
-        return;
+      if (error) return;
+      if (newUser) {
+        dispatch(addUser(newUser));
+        toast.success('User added successfully');
+        setIsModalOpen(false);
       }
-
-      const user: User = await response.json();
-      dispatch(addUser(user));
-      toast.success('User added successfully');
-      setIsModalOpen(false);
-    } catch (error) {
-      toast.error((error as Error).message || 'Failed to add user');
     } finally {
       dispatch(setCreateLoading(false));
     }
@@ -117,60 +106,51 @@ const Dashboard = () => {
 
     try {
       dispatch(setUpdateLoading(selectedUser.id));
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/users/${selectedUser.id}`,
+      const { data: updatedUser, error } = await apiRequest<User>(
+        `/api/users/${selectedUser.id}`,
         {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify(data),
-        }
+        },
+        token as string
       );
 
-      if (!response.ok) {
-        toast.error('Failed to update user');
-        return;
+      if (error) return;
+      if (updatedUser) {
+        dispatch(updateUser(updatedUser));
+        toast.success('User updated successfully');
+        setIsModalOpen(false);
+        setSelectedUser(undefined);
       }
-
-      const updatedUser: User = await response.json();
-      dispatch(updateUser(updatedUser));
-      toast.success('User updated successfully');
-      setIsModalOpen(false);
-      setSelectedUser(undefined);
-    } catch (error) {
-      toast.error((error as Error).message || 'Failed to update user');
     } finally {
       dispatch(setUpdateLoading(null));
     }
   };
 
-  const handleDeleteUser = async (id: string) => {
+  const handleDeleteConfirm = (userId: string) => {
+    setDeleteConfirm({ open: true, userId });
+  };
+
+  const handleDeleteUser = async () => {
+    const userId = deleteConfirm.userId;
+    if (!userId) return;
+
     try {
-      dispatch(setDeleteLoading(id));
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/users/${id}`,
+      dispatch(setDeleteLoading(userId));
+      const { error } = await apiRequest(
+        `/api/users/${userId}`,
         {
           method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        },
+        token as string
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.error || 'Failed to delete user');
-        return;
-      }
-
-      dispatch(deleteUser(id));
+      if (error) return;
+      dispatch(deleteUser(userId));
       toast.success('User deleted successfully');
-    } catch (error) {
-      toast.error((error as Error).message || 'Failed to delete user');
     } finally {
       dispatch(setDeleteLoading(null));
+      setDeleteConfirm({ open: false, userId: null });
     }
   };
 
@@ -262,7 +242,7 @@ const Dashboard = () => {
             <UserTable
               users={users}
               onEdit={openEditModal}
-              onDelete={handleDeleteUser}
+              onDelete={handleDeleteConfirm}
               operationLoading={operationLoading}
             />
           )}
@@ -280,8 +260,17 @@ const Dashboard = () => {
         isEdit={!!selectedUser}
         loading={operationLoading.create || !!operationLoading.update}
       />
+
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        title="Delete User"
+        message="Are you sure you want to delete this user? This action cannot be undone."
+        onConfirm={handleDeleteUser}
+        onCancel={() => setDeleteConfirm({ open: false, userId: null })}
+        loading={!!operationLoading.delete}
+      />
     </Box>
   );
 };
 
-export default Dashboard;
+export default memo(Dashboard);
