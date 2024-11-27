@@ -6,8 +6,6 @@ import { toast } from 'sonner';
 import { loginSchema } from '../validation/schema';
 import { useDispatch } from 'react-redux';
 import { setUser, setToken } from '../store/slices/auth-slice';
-import { auth } from '../firebase/config';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import { CheckCircle } from 'lucide-react';
 
 interface LoginInputs {
@@ -29,26 +27,33 @@ const Login = () => {
 
   const onSubmit = async (data: LoginInputs) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        `${data.email}`,
-        data.password
-      );
-      const token = await userCredential.user.getIdToken();
+      const response = await fetch('http://localhost:3000/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
 
-      dispatch(setToken(token));
+      if (!response.ok) {
+        throw new Error('Invalid credentials');
+      }
+
+      const user = await response.json();
       dispatch(
         setUser({
-          uid: userCredential.user.uid,
-          email: userCredential.user.email!,
-          displayName: userCredential.user.displayName || data.email,
+          uid: user.id,
+          email: user.email,
+          displayName: `${user.firstName} ${user.lastName}`,
         })
       );
-
+      dispatch(setToken(user.token)); // Ensure your backend sends a token
       navigate('/dashboard');
     } catch (error) {
-      console.error({ error });
-      toast.error('Invalid credentials');
+      toast.error((error as Error).message);
     }
   };
 
