@@ -11,6 +11,8 @@ import {
   Grid,
   InputAdornment,
   IconButton,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { loginSchema } from '../validation/schema';
 import { useDispatch } from 'react-redux';
@@ -35,6 +37,8 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const {
     register,
@@ -72,54 +76,90 @@ const Login = () => {
   return (
     <Box
       sx={{
-        minHeight: '100svh',
+        height: '100svh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         bgcolor: 'primary.main',
         width: '100svw',
+        p: { xs: 2, sm: 0 },
       }}
     >
       <Paper
         elevation={3}
         sx={{
           display: 'flex',
-          width: '800px',
+          flexDirection: { xs: 'column', md: 'row' },
+          width: '100%',
+          maxWidth: { xs: '100%', sm: '450px', md: '800px' },
           overflow: 'hidden',
+          borderRadius: { xs: 2, sm: 3 },
         }}
       >
         <Box
           sx={{
-            flex: 1,
-            p: 4,
+            flex: { md: 1 },
+            p: { xs: 3, sm: 4 },
             bgcolor: 'primary.main',
             color: 'white',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
+            minHeight: { xs: '200px', md: 'auto' },
           }}
         >
-          <Typography variant="h4" gutterBottom>
+          <Typography
+            variant={isMobile ? 'h5' : 'h4'}
+            gutterBottom
+            sx={{ fontWeight: 600 }}
+          >
             Welcome
           </Typography>
-          <Typography variant="subtitle1" gutterBottom>
+          <Typography
+            variant={isMobile ? 'body2' : 'subtitle1'}
+            gutterBottom
+            sx={{ opacity: 0.9 }}
+          >
             to online help center!
           </Typography>
-          <Box sx={{ mt: 4 }}>
+          <Box sx={{ mt: { xs: 2, md: 4 } }}>
             <Typography
-              sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: '4px' }}
+              variant={isMobile ? 'body2' : 'body1'}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                mb: 1.5,
+                gap: '8px',
+                opacity: 0.9,
+              }}
             >
-              <CheckCircle /> Secure and reliable for users
+              <CheckCircle size={isMobile ? 16 : 20} /> Secure and reliable for
+              users
             </Typography>
             <Typography
-              sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: '4px' }}
+              variant={isMobile ? 'body2' : 'body1'}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                mb: 1.5,
+                gap: '8px',
+                opacity: 0.9,
+              }}
             >
-              <CheckCircle /> Even your grandma can use it
+              <CheckCircle size={isMobile ? 16 : 20} /> Even your grandma can
+              use it
             </Typography>
             <Typography
-              sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+              variant={isMobile ? 'body2' : 'body1'}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                opacity: 0.9,
+              }}
             >
-              <CheckCircle /> Works 15% faster than others
+              <CheckCircle size={isMobile ? 16 : 20} /> Works 15% faster than
+              others
             </Typography>
           </Box>
         </Box>
@@ -128,14 +168,23 @@ const Login = () => {
           component="form"
           onSubmit={handleSubmit(onSubmit)}
           sx={{
-            flex: 1,
-            p: 4,
+            flex: { md: 1 },
+            p: { xs: 3, sm: 4 },
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
+            bgcolor: 'background.paper',
           }}
         >
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography
+                variant={isMobile ? 'h6' : 'h5'}
+                sx={{ mb: 3, fontWeight: 600 }}
+              >
+                Sign In
+              </Typography>
+            </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -143,6 +192,11 @@ const Login = () => {
                 {...register('email')}
                 error={!!errors.email}
                 helperText={errors.email?.message}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    borderRadius: '8px',
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -160,20 +214,36 @@ const Login = () => {
                         aria-label="toggle password visibility"
                         onClick={togglePasswordVisibility}
                         edge="end"
+                        size={isMobile ? 'small' : 'medium'}
                       >
                         {showPassword ? (
-                          <EyeOff size={20} />
+                          <EyeOff size={isMobile ? 18 : 20} />
                         ) : (
-                          <Eye size={20} />
+                          <Eye size={isMobile ? 18 : 20} />
                         )}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    borderRadius: '8px',
+                  },
+                }}
               />
             </Grid>
-            <Grid item xs={12}>
-              <Button fullWidth type="submit" variant="contained" size="large">
+            <Grid item xs={12} sx={{ mt: { xs: 1, sm: 2 } }}>
+              <Button
+                fullWidth
+                type="submit"
+                variant="contained"
+                size={isMobile ? 'medium' : 'large'}
+                sx={{
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  py: { xs: 1.5, sm: 2 },
+                }}
+              >
                 Log in
               </Button>
             </Grid>
