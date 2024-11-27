@@ -9,11 +9,17 @@ import {
   IconButton,
   Typography,
   Box,
+  CircularProgress,
 } from '@mui/material';
 import { Edit2, Trash2 } from 'lucide-react';
 import { UserTableProps } from '../types';
 
-const UserTable = ({ users, onEdit, onDelete }: UserTableProps) => {
+const UserTable = ({
+  users,
+  onEdit,
+  onDelete,
+  operationLoading,
+}: UserTableProps) => {
   if (users.length === 0) {
     return (
       <Box
@@ -68,15 +74,29 @@ const UserTable = ({ users, onEdit, onDelete }: UserTableProps) => {
                   color="primary"
                   size="small"
                   sx={{ mr: 1 }}
+                  disabled={
+                    !!operationLoading.update || !!operationLoading.delete
+                  }
                 >
-                  <Edit2 size={18} />
+                  {operationLoading.update === user.id ? (
+                    <CircularProgress size={18} color="primary" />
+                  ) : (
+                    <Edit2 size={18} />
+                  )}
                 </IconButton>
                 <IconButton
                   onClick={() => onDelete(user.id)}
                   color="error"
                   size="small"
+                  disabled={
+                    !!operationLoading.update || !!operationLoading.delete
+                  }
                 >
-                  <Trash2 size={18} />
+                  {operationLoading.delete === user.id ? (
+                    <CircularProgress size={18} color="error" />
+                  ) : (
+                    <Trash2 size={18} />
+                  )}
                 </IconButton>
               </TableCell>
             </TableRow>

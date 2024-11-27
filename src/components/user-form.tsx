@@ -1,10 +1,15 @@
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, TextField, Button, Grid } from '@mui/material';
+import { Box, TextField, Button, Grid, CircularProgress } from '@mui/material';
 import { userEditSchema, userSchema } from '../validation/schema';
 import { UserFormProps, UserModalData } from '../types';
 
-const UserForm = ({ onSubmit, initialValues, isEdit }: UserFormProps) => {
+const UserForm = ({
+  onSubmit,
+  initialValues,
+  isEdit,
+  loading,
+}: UserFormProps) => {
   const {
     register,
     handleSubmit,
@@ -24,6 +29,7 @@ const UserForm = ({ onSubmit, initialValues, isEdit }: UserFormProps) => {
             {...register('firstName')}
             error={!!errors.firstName}
             helperText={errors.firstName?.message}
+            disabled={loading}
           />
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -33,6 +39,7 @@ const UserForm = ({ onSubmit, initialValues, isEdit }: UserFormProps) => {
             {...register('middleName')}
             error={!!errors.middleName}
             helperText={errors.middleName?.message}
+            disabled={loading}
           />
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -42,6 +49,7 @@ const UserForm = ({ onSubmit, initialValues, isEdit }: UserFormProps) => {
             {...register('lastName')}
             error={!!errors.lastName}
             helperText={errors.lastName?.message}
+            disabled={loading}
           />
         </Grid>
         <Grid item xs={12}>
@@ -51,6 +59,7 @@ const UserForm = ({ onSubmit, initialValues, isEdit }: UserFormProps) => {
             {...register('email')}
             error={!!errors.email}
             helperText={errors.email?.message}
+            disabled={loading}
           />
         </Grid>
         {!isEdit && (
@@ -63,6 +72,7 @@ const UserForm = ({ onSubmit, initialValues, isEdit }: UserFormProps) => {
                 {...register('password')}
                 error={!!errors.password}
                 helperText={errors.password?.message}
+                disabled={loading}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -73,17 +83,29 @@ const UserForm = ({ onSubmit, initialValues, isEdit }: UserFormProps) => {
                 {...register('confirmPassword')}
                 error={!!errors.confirmPassword}
                 helperText={errors.confirmPassword?.message}
+                disabled={loading}
               />
             </Grid>
           </>
         )}
         <Grid item xs={12}>
           <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-            <Button type="reset" variant="outlined">
+            <Button type="reset" variant="outlined" disabled={loading}>
               Clear
             </Button>
-            <Button type="submit" variant="contained">
-              {isEdit ? 'Update' : 'Submit'}
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={loading}
+              sx={{ minWidth: 100 }}
+            >
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : isEdit ? (
+                'Update'
+              ) : (
+                'Submit'
+              )}
             </Button>
           </Box>
         </Grid>

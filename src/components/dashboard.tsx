@@ -20,6 +20,9 @@ import {
   updateUser,
   deleteUser,
   setLoading,
+  setCreateLoading,
+  setUpdateLoading,
+  setDeleteLoading,
 } from '../store/slices/user-slice';
 import type { RootState } from '../store/store';
 import UserModal from './user-modal';
@@ -30,7 +33,9 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, token } = useSelector((state: RootState) => state.auth);
-  const { users, loading } = useSelector((state: RootState) => state.users);
+  const { users, loading, operationLoading } = useSelector(
+    (state: RootState) => state.users
+  );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<UserModalData | undefined>(
     undefined
@@ -44,7 +49,7 @@ const Dashboard = () => {
           `${import.meta.env.VITE_API_BASE_URL}/api/users`,
           {
             headers: {
-              Authorization: `Bearer ${token}`, // Add token to headers
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -78,7 +83,7 @@ const Dashboard = () => {
 
   const handleAddUser = async (data: UserModalData) => {
     try {
-      dispatch(setLoading(true));
+      dispatch(setCreateLoading(true));
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/api/users`,
         {
@@ -93,6 +98,7 @@ const Dashboard = () => {
 
       if (!response.ok) {
         toast.error('Failed to add user');
+        return;
       }
 
       const user: User = await response.json();
@@ -102,15 +108,15 @@ const Dashboard = () => {
     } catch (error) {
       toast.error((error as Error).message || 'Failed to add user');
     } finally {
-      dispatch(setLoading(false));
+      dispatch(setCreateLoading(false));
     }
   };
 
   const handleEditUser = async (data: UserModalData) => {
-    if (!selectedUser) return;
+    if (!selectedUser?.id) return;
 
     try {
-      dispatch(setLoading(true));
+      dispatch(setUpdateLoading(selectedUser.id));
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/api/users/${selectedUser.id}`,
         {
@@ -125,6 +131,7 @@ const Dashboard = () => {
 
       if (!response.ok) {
         toast.error('Failed to update user');
+        return;
       }
 
       const updatedUser: User = await response.json();
@@ -135,19 +142,18 @@ const Dashboard = () => {
     } catch (error) {
       toast.error((error as Error).message || 'Failed to update user');
     } finally {
-      dispatch(setLoading(false));
+      dispatch(setUpdateLoading(null));
     }
   };
 
   const handleDeleteUser = async (id: string) => {
     try {
-      dispatch(setLoading(true));
+      dispatch(setDeleteLoading(id));
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/api/users/${id}`,
         {
           method: 'DELETE',
           headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
         }
@@ -155,8 +161,8 @@ const Dashboard = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        toast.error('Failed to delete user');
         toast.error(errorData.error || 'Failed to delete user');
+        return;
       }
 
       dispatch(deleteUser(id));
@@ -164,7 +170,7 @@ const Dashboard = () => {
     } catch (error) {
       toast.error((error as Error).message || 'Failed to delete user');
     } finally {
-      dispatch(setLoading(false));
+      dispatch(setDeleteLoading(null));
     }
   };
 
@@ -229,6 +235,7 @@ const Dashboard = () => {
                 setSelectedUser(undefined);
                 setIsModalOpen(true);
               }}
+              disabled={operationLoading.create}
               sx={{
                 px: 3,
                 py: 1,
@@ -239,7 +246,11 @@ const Dashboard = () => {
                 },
               }}
             >
-              Add User
+              {operationLoading.create ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                'Add User'
+              )}
             </Button>
           </Box>
 
@@ -252,6 +263,7 @@ const Dashboard = () => {
               users={users}
               onEdit={openEditModal}
               onDelete={handleDeleteUser}
+              operationLoading={operationLoading}
             />
           )}
         </Paper>
@@ -266,6 +278,7 @@ const Dashboard = () => {
         onSubmit={selectedUser ? handleEditUser : handleAddUser}
         initialValues={selectedUser}
         isEdit={!!selectedUser}
+        loading={operationLoading.create || !!operationLoading.update}
       />
     </Box>
   );

@@ -15,6 +15,7 @@ const UserModal = ({
   onSubmit,
   initialValues,
   isEdit,
+  loading,
 }: UserModalProps) => {
   return (
     <Dialog
@@ -40,6 +41,7 @@ const UserModal = ({
           {isEdit ? 'Edit User' : 'Add New User'}
           <IconButton
             onClick={onClose}
+            disabled={loading}
             sx={{
               color: 'text.secondary',
               '&:hover': {
@@ -66,6 +68,7 @@ const UserModal = ({
           onSubmit={onSubmit}
           initialValues={initialValues || undefined}
           isEdit={isEdit}
+          loading={loading}
         />
       </DialogContent>
     </Dialog>
