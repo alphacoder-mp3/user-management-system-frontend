@@ -1,23 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface User {
-  id: string;
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  email: string;
-}
-
-interface UsersState {
-  users: User[];
-  loading: boolean;
-  operationLoading: {
-    create: boolean;
-    update: string | null;
-    delete: string | null;
-  };
-  error: string | null;
-}
+import { User, UsersState } from '../../types';
 
 const initialState: UsersState = {
   users: [],

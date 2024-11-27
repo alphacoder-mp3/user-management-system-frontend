@@ -19,19 +19,7 @@ import { useDispatch } from 'react-redux';
 import { setUser, setToken } from '../store/slices/auth-slice';
 import { CheckCircle, Eye, EyeOff } from 'lucide-react';
 import { apiRequest } from '../utils/api';
-
-interface LoginInputs {
-  email: string;
-  password: string;
-}
-
-interface LoginResponse {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  token: string;
-}
+import { LoginInputs, LoginResponse } from '../types';
 
 const Login = () => {
   const navigate = useNavigate();

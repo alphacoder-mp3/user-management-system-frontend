@@ -1,9 +1,9 @@
 export interface User {
   id: string;
   firstName: string;
+  middleName?: string;
   lastName: string;
   email: string;
-  middleName?: string;
 }
 
 export interface UserModalData {
@@ -41,4 +41,24 @@ export interface UserTableProps {
     update: string | null;
     delete: string | null;
   };
+}
+
+export interface UsersState {
+  users: User[];
+  loading: boolean;
+  operationLoading: {
+    create: boolean;
+    update: string | null;
+    delete: string | null;
+  };
+  error: string | null;
+}
+
+export interface AuthState {
+  user: null | {
+    uid: string;
+    email: string;
+    displayName: string;
+  };
+  token: string | null;
 }
