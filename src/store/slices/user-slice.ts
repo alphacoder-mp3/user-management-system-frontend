@@ -11,12 +11,22 @@ interface User {
 interface UsersState {
   users: User[];
   loading: boolean;
+  operationLoading: {
+    create: boolean;
+    update: string | null;
+    delete: string | null;
+  };
   error: string | null;
 }
 
 const initialState: UsersState = {
   users: [],
   loading: false,
+  operationLoading: {
+    create: false,
+    update: null,
+    delete: null,
+  },
   error: null,
 };
 
@@ -44,6 +54,15 @@ const userSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
+    setCreateLoading: (state, action: PayloadAction<boolean>) => {
+      state.operationLoading.create = action.payload;
+    },
+    setUpdateLoading: (state, action: PayloadAction<string | null>) => {
+      state.operationLoading.update = action.payload;
+    },
+    setDeleteLoading: (state, action: PayloadAction<string | null>) => {
+      state.operationLoading.delete = action.payload;
+    },
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
@@ -56,6 +75,9 @@ export const {
   updateUser,
   deleteUser,
   setLoading,
+  setCreateLoading,
+  setUpdateLoading,
+  setDeleteLoading,
   setError,
 } = userSlice.actions;
 export default userSlice.reducer;
