@@ -10,7 +10,7 @@ export const loginSchema = yup.object().shape({
   password: yup
     .string()
     .min(8, 'Password must be at least 8 characters')
-    .max(16, 'Password must not exceed 16 characters')
+    .max(20, 'Password must not exceed 20 characters')
     .matches(/^\S*$/, 'No spaces allowed')
     .required('Password is required'),
 });
@@ -26,7 +26,7 @@ export const userSchema = yup.object().shape({
   password: yup
     .string()
     .min(8, 'Password must be at least 8 characters')
-    .max(16, 'Password must not exceed 16 characters')
+    .max(20, 'Password must not exceed 20 characters')
     .required('Password is required'),
   confirmPassword: yup
     .string()
