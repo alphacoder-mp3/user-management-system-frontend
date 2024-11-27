@@ -21,117 +21,125 @@ import {
   deleteUser,
   setLoading,
 } from '../store/slices/user-slice';
-import { auth, db } from '../firebase/config';
-import { signOut, createUserWithEmailAndPassword } from 'firebase/auth';
-import {
-  collection,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  query,
-  orderBy,
-} from 'firebase/firestore';
 import type { RootState } from '../store/store';
 import UserModal from './user-modal';
 import UserTable from './user-table';
 
+interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  middleName?: string;
+}
+interface UserModalData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  middleName?: string;
+  password?: string;
+}
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user, token } = useSelector((state: RootState) => state.auth);
   const { users, loading } = useSelector((state: RootState) => state.users);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-
-  const fetchUsers = async () => {
-    try {
-      dispatch(setLoading(true));
-      const usersQuery = query(
-        collection(db, 'users'),
-        orderBy('createdAt', 'desc')
-      );
-      const querySnapshot = await getDocs(usersQuery);
-      const usersList = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      dispatch(setUsers(usersList));
-    } catch (error) {
-      toast.error('Failed to fetch users');
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   useEffect(() => {
-    fetchUsers();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    const fetchUsers = async () => {
+      try {
+        dispatch(setLoading(true));
+        const response = await fetch('http://localhost:3000/api/users', {
+          headers: {
+            Authorization: `Bearer ${token}`, // Add token to headers
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch users');
+        }
+
+        const data: User[] = await response.json();
+        dispatch(setUsers(data));
+      } catch (error) {
+        toast.error((error as Error).message || 'Failed to fetch users');
+      } finally {
+        dispatch(setLoading(false));
+      }
+    };
+
+    if (token) {
+      fetchUsers();
+    }
+  }, [dispatch, token]);
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
       dispatch(logout());
       navigate('/');
     } catch (error) {
-      toast.error('Failed to logout');
+      toast.error((error as Error).message || 'Failed to logout');
     }
   };
 
-  const handleAddUser = async (data: any) => {
+  const handleAddUser = async (data: UserModalData) => {
     try {
       dispatch(setLoading(true));
-      // Create auth user
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        `${data.username}@example.com`,
-        data.password
-      );
+      const response = await fetch('http://localhost:3000/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
 
-      // Add user to Firestore
-      const userDoc = {
-        uid: userCredential.user.uid,
-        firstName: data.firstName,
-        middleName: data.middleName || '',
-        lastName: data.lastName,
-        username: data.username,
-        email: data.username,
-        createdAt: new Date().toISOString(),
-      };
+      if (!response.ok) {
+        throw new Error('Failed to add user');
+      }
 
-      const docRef = await addDoc(collection(db, 'users'), userDoc);
-      dispatch(addUser({ id: docRef.id, ...userDoc }));
+      const user: User = await response.json();
+      dispatch(addUser(user));
       toast.success('User added successfully');
       setIsModalOpen(false);
-      fetchUsers(); // Refresh the list
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to add user');
+    } catch (error) {
+      toast.error((error as Error).message || 'Failed to add user');
     } finally {
       dispatch(setLoading(false));
     }
   };
 
-  const handleEditUser = async (data: any) => {
+  const handleEditUser = async (data: UserModalData) => {
+    if (!selectedUser) return;
+
     try {
       dispatch(setLoading(true));
-      const userRef = doc(db, 'users', selectedUser.id);
-      const updateData = {
-        firstName: data.firstName,
-        middleName: data.middleName || '',
-        lastName: data.lastName,
-        username: data.username,
-        updatedAt: new Date().toISOString(),
-      };
+      const response = await fetch(
+        `http://localhost:3000/api/users/${selectedUser.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
-      await updateDoc(userRef, updateData);
-      dispatch(updateUser({ id: selectedUser.id, ...updateData }));
+      if (!response.ok) {
+        throw new Error('Failed to update user');
+      }
+
+      const updatedUser: User = await response.json();
+      dispatch(updateUser(updatedUser));
       toast.success('User updated successfully');
       setIsModalOpen(false);
       setSelectedUser(null);
-      fetchUsers(); // Refresh the list
     } catch (error) {
-      toast.error('Failed to update user');
+      toast.error((error as Error).message || 'Failed to update user');
     } finally {
       dispatch(setLoading(false));
     }
@@ -140,18 +148,30 @@ const Dashboard = () => {
   const handleDeleteUser = async (id: string) => {
     try {
       dispatch(setLoading(true));
-      await deleteDoc(doc(db, 'users', id));
+      const response = await fetch(`http://localhost:3000/api/users/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error('Failed to delete user');
+        throw new Error(errorData.error || 'Failed to delete user');
+      }
+
       dispatch(deleteUser(id));
       toast.success('User deleted successfully');
-      fetchUsers(); // Refresh the list
     } catch (error) {
-      toast.error('Failed to delete user');
+      toast.error((error as Error).message || 'Failed to delete user');
     } finally {
       dispatch(setLoading(false));
     }
   };
 
-  const openEditModal = (user: any) => {
+  const openEditModal = (user: User) => {
     setSelectedUser(user);
     setIsModalOpen(true);
   };
