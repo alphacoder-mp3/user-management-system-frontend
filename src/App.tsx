@@ -5,7 +5,8 @@ import { Toaster } from 'sonner';
 import { theme } from './theme';
 import { store } from './store/store';
 import Login from './pages/login';
-import Dashboard from './components/dashboard';
+import { Suspense, lazy } from 'react';
+const Dashboard = lazy(() => import('./components/dashboard'));
 import ProtectedRoute from './components/protected-routes';
 
 function App() {
@@ -19,7 +20,10 @@ function App() {
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <Suspense fallback={<div>Loading...</div>}>
+                    {' '}
+                    <Dashboard />
+                  </Suspense>
                 </ProtectedRoute>
               }
             />
