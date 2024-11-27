@@ -42,7 +42,7 @@ const Login = () => {
       );
 
       if (!response.ok) {
-        throw new Error('Invalid credentials');
+        toast.error('Invalid credentials');
       }
 
       const user = await response.json();

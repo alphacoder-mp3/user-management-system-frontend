@@ -50,7 +50,7 @@ const Dashboard = () => {
         );
 
         if (!response.ok) {
-          throw new Error('Failed to fetch users');
+          toast.error('Failed to fetch users');
         }
 
         const data: User[] = await response.json();
@@ -92,7 +92,7 @@ const Dashboard = () => {
       );
 
       if (!response.ok) {
-        throw new Error('Failed to add user');
+        toast.error('Failed to add user');
       }
 
       const user: User = await response.json();
@@ -124,7 +124,7 @@ const Dashboard = () => {
       );
 
       if (!response.ok) {
-        throw new Error('Failed to update user');
+        toast.error('Failed to update user');
       }
 
       const updatedUser: User = await response.json();
@@ -156,7 +156,7 @@ const Dashboard = () => {
       if (!response.ok) {
         const errorData = await response.json();
         toast.error('Failed to delete user');
-        throw new Error(errorData.error || 'Failed to delete user');
+        toast.error(errorData.error || 'Failed to delete user');
       }
 
       dispatch(deleteUser(id));
