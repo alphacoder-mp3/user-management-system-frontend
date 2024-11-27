@@ -1,30 +1,16 @@
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, TextField, Button, Grid } from '@mui/material';
-import { userSchema } from '../validation/schema';
-
-interface UserFormInputs {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-
-interface UserFormProps {
-  onSubmit: (data: UserFormInputs) => void;
-  initialValues?: Partial<UserFormInputs>;
-  isEdit?: boolean;
-}
+import { userEditSchema, userSchema } from '../validation/schema';
+import { UserFormProps, UserModalData } from '../types';
 
 const UserForm = ({ onSubmit, initialValues, isEdit }: UserFormProps) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<UserFormInputs>({
-    resolver: yupResolver(userSchema),
+  } = useForm<UserModalData>({
+    resolver: yupResolver(!isEdit ? userSchema : userEditSchema),
     defaultValues: initialValues,
   });
 

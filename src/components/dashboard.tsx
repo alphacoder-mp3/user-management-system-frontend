@@ -24,21 +24,7 @@ import {
 import type { RootState } from '../store/store';
 import UserModal from './user-modal';
 import UserTable from './user-table';
-
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  middleName?: string;
-}
-interface UserModalData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  middleName?: string;
-  password?: string;
-}
+import { User, UserModalData } from '../types';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -46,7 +32,9 @@ const Dashboard = () => {
   const { user, token } = useSelector((state: RootState) => state.auth);
   const { users, loading } = useSelector((state: RootState) => state.users);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserModalData | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -137,7 +125,7 @@ const Dashboard = () => {
       dispatch(updateUser(updatedUser));
       toast.success('User updated successfully');
       setIsModalOpen(false);
-      setSelectedUser(null);
+      setSelectedUser(undefined);
     } catch (error) {
       toast.error((error as Error).message || 'Failed to update user');
     } finally {
@@ -229,7 +217,7 @@ const Dashboard = () => {
               variant="contained"
               startIcon={<UserPlus />}
               onClick={() => {
-                setSelectedUser(null);
+                setSelectedUser(undefined);
                 setIsModalOpen(true);
               }}
               sx={{
@@ -264,7 +252,7 @@ const Dashboard = () => {
         open={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
-          setSelectedUser(null);
+          setSelectedUser(undefined);
         }}
         onSubmit={selectedUser ? handleEditUser : handleAddUser}
         initialValues={selectedUser}

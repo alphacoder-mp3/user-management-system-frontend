@@ -7,14 +7,7 @@ import {
 } from '@mui/material';
 import { X } from 'lucide-react';
 import UserForm from './user-form';
-
-interface UserModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (data: any) => void;
-  initialValues?: any;
-  isEdit?: boolean;
-}
+import { UserModalProps } from '../types';
 
 const UserModal = ({
   open,
@@ -71,7 +64,7 @@ const UserModal = ({
       >
         <UserForm
           onSubmit={onSubmit}
-          initialValues={initialValues}
+          initialValues={initialValues || undefined}
           isEdit={isEdit}
         />
       </DialogContent>

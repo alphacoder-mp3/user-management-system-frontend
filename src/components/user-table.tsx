@@ -11,19 +11,7 @@ import {
   Box,
 } from '@mui/material';
 import { Edit2, Trash2 } from 'lucide-react';
-
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-}
-
-interface UserTableProps {
-  users: User[];
-  onEdit: (user: User) => void;
-  onDelete: (id: string) => void;
-}
+import { UserTableProps } from '../types';
 
 const UserTable = ({ users, onEdit, onDelete }: UserTableProps) => {
   if (users.length === 0) {
