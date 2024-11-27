@@ -5,6 +5,7 @@ export interface User {
   email: string;
   middleName?: string;
 }
+
 export interface UserModalData {
   id?: string;
   firstName: string;
@@ -19,6 +20,7 @@ export interface UserFormProps {
   onSubmit: (data: UserModalData) => Promise<void>;
   initialValues?: Partial<UserModalData>;
   isEdit?: boolean;
+  loading?: boolean;
 }
 
 export interface UserModalProps {
@@ -27,10 +29,16 @@ export interface UserModalProps {
   onSubmit: (data: UserModalData) => Promise<void>;
   initialValues?: Partial<UserModalData>;
   isEdit?: boolean;
+  loading?: boolean;
 }
 
 export interface UserTableProps {
   users: User[];
   onEdit: (user: User) => void;
   onDelete: (id: string) => void;
+  operationLoading: {
+    create: boolean;
+    update: string | null;
+    delete: string | null;
+  };
 }
