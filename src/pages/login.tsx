@@ -11,7 +11,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { CheckCircle } from 'lucide-react';
 
 interface LoginInputs {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -31,7 +31,7 @@ const Login = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
-        `${data.username}`,
+        `${data.email}`,
         data.password
       );
       const token = await userCredential.user.getIdToken();
@@ -41,7 +41,7 @@ const Login = () => {
         setUser({
           uid: userCredential.user.uid,
           email: userCredential.user.email!,
-          displayName: userCredential.user.displayName || data.username,
+          displayName: userCredential.user.displayName || data.email,
         })
       );
 
@@ -123,9 +123,9 @@ const Login = () => {
               <TextField
                 fullWidth
                 label="Email"
-                {...register('username')}
-                error={!!errors.username}
-                helperText={errors.username?.message}
+                {...register('email')}
+                error={!!errors.email}
+                helperText={errors.email?.message}
               />
             </Grid>
             <Grid item xs={12}>

@@ -1,9 +1,9 @@
 import * as yup from 'yup';
 
 export const loginSchema = yup.object().shape({
-  username: yup
+  email: yup
     .string()
-    .min(3, 'Username must be at least 3 characters')
+    .min(3, 'Email must be at least 3 characters')
     .matches(/^\S*$/, 'No spaces allowed')
     .required('Username is required'),
   password: yup
@@ -18,9 +18,9 @@ export const userSchema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
   middleName: yup.string(),
   lastName: yup.string().required('Last name is required'),
-  username: yup
+  email: yup
     .string()
-    .max(20, 'Username must not exceed 20 characters')
+    .max(20, 'Email must not exceed 20 characters')
     .required('Username is required'),
   password: yup
     .string()
