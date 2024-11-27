@@ -77,7 +77,6 @@ const Dashboard = () => {
   };
 
   const handleAddUser = async (data: UserModalData) => {
-    // `${import.meta.env.VITE_API_BASE_URL}
     try {
       dispatch(setLoading(true));
       const response = await fetch(

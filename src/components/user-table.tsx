@@ -45,6 +45,7 @@ const UserTable = ({ users, onEdit, onDelete }: UserTableProps) => {
       <Table>
         <TableHead>
           <TableRow>
+            <TableCell sx={{ fontWeight: 600 }}>Sr No.</TableCell>
             <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
             <TableCell sx={{ fontWeight: 600 }}>Username</TableCell>
             <TableCell align="right" sx={{ fontWeight: 600 }}>
@@ -53,11 +54,12 @@ const UserTable = ({ users, onEdit, onDelete }: UserTableProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {users.map(user => (
+          {users.map((user, index) => (
             <TableRow
               key={user.id}
               sx={{ '&:hover': { bgcolor: 'action.hover' } }}
             >
+              <TableCell>{index + 1}</TableCell>
               <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell align="right">
