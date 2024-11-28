@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { User, UsersState } from '../../types';
+import { User, UsersState, PaginationInfo } from '../../types';
 
 const initialState: UsersState = {
   users: [],
@@ -10,6 +10,12 @@ const initialState: UsersState = {
     delete: null,
   },
   error: null,
+  pagination: {
+    currentPage: 1,
+    totalPages: 1,
+    totalUsers: 0,
+    pageSize: 10,
+  },
 };
 
 const userSlice = createSlice({
@@ -18,6 +24,9 @@ const userSlice = createSlice({
   reducers: {
     setUsers: (state, action: PayloadAction<User[]>) => {
       state.users = action.payload;
+    },
+    setPagination: (state, action: PayloadAction<PaginationInfo>) => {
+      state.pagination = action.payload;
     },
     addUser: (state, action: PayloadAction<User>) => {
       state.users.push(action.payload);
@@ -53,6 +62,7 @@ const userSlice = createSlice({
 
 export const {
   setUsers,
+  setPagination,
   addUser,
   updateUser,
   deleteUser,

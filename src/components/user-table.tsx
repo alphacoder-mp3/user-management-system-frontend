@@ -40,7 +40,7 @@ const UserTable = ({
         }}
       >
         <Typography variant="body1" color="text.secondary">
-          No users found. Add your first user to get started.
+          No users found on this page. Add your first user to get started.
         </Typography>
       </Box>
     );
@@ -113,7 +113,7 @@ const UserTable = ({
               </Box>
               <Box>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Email
+                  Username
                 </Typography>
                 <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
                   {user.email}

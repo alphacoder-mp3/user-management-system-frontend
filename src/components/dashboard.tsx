@@ -16,9 +16,8 @@ import { toast } from 'sonner';
 import { logout } from '../store/slices/auth-slice';
 import {
   setUsers,
-  addUser,
+  setPagination,
   updateUser,
-  deleteUser,
   setLoading,
   setCreateLoading,
   setUpdateLoading,
@@ -27,15 +26,16 @@ import {
 import type { RootState } from '../store/store';
 import UserModal from './user-modal';
 import UserTable from './user-table';
+import Pagination from './pagination';
 import ConfirmDialog from './confirm-dialog';
 import { apiRequest } from '../utils/api';
-import { User, UserModalData } from '../types';
+import { User, UserModalData, PaginatedResponse } from '../types';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, token } = useSelector((state: RootState) => state.auth);
-  const { users, loading, operationLoading } = useSelector(
+  const { users, loading, operationLoading, pagination } = useSelector(
     (state: RootState) => state.users
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -50,32 +50,41 @@ const Dashboard = () => {
     userId: null,
   });
 
-  const fetchUsers = useCallback(async () => {
-    try {
-      dispatch(setLoading(true));
-      const { data, error } = await apiRequest<User[]>(
-        '/api/users',
-        undefined,
-        token as string
-      );
+  const fetchUsers = useCallback(
+    async (page: number = 1) => {
+      try {
+        dispatch(setLoading(true));
+        const { data, error } = await apiRequest<PaginatedResponse<User>>(
+          `/api/users?page=${page}&limit=${pagination.pageSize}`,
+          undefined,
+          token as string
+        );
 
-      if (error) return;
-      if (data) dispatch(setUsers(data));
-    } finally {
-      dispatch(setLoading(false));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
+        if (error) return;
+        if (data) {
+          dispatch(setUsers(data.users));
+          dispatch(setPagination(data.pagination));
+        }
+      } finally {
+        dispatch(setLoading(false));
+      }
+    },
+    [dispatch, token, pagination.pageSize]
+  );
 
   useEffect(() => {
     if (token) {
-      fetchUsers();
+      fetchUsers(pagination.currentPage);
     }
-  }, [fetchUsers, token]);
+  }, [fetchUsers, token, pagination.currentPage]);
 
   const handleLogout = () => {
     dispatch(logout());
     navigate('/');
+  };
+
+  const handlePageChange = (page: number) => {
+    fetchUsers(page);
   };
 
   const handleAddUser = async (data: UserModalData) => {
@@ -92,7 +101,7 @@ const Dashboard = () => {
 
       if (error) return;
       if (newUser) {
-        dispatch(addUser(newUser));
+        await fetchUsers(1); // Refresh the first page after adding
         toast.success('User added successfully');
         setIsModalOpen(false);
       }
@@ -146,7 +155,9 @@ const Dashboard = () => {
       );
 
       if (error) return;
-      dispatch(deleteUser(userId));
+
+      // Refresh current page after deletion
+      await fetchUsers(pagination.currentPage);
       toast.success('User deleted successfully');
     } finally {
       dispatch(setDeleteLoading(null));
@@ -239,12 +250,18 @@ const Dashboard = () => {
               <CircularProgress />
             </Box>
           ) : (
-            <UserTable
-              users={users}
-              onEdit={openEditModal}
-              onDelete={handleDeleteConfirm}
-              operationLoading={operationLoading}
-            />
+            <>
+              <UserTable
+                users={users}
+                onEdit={openEditModal}
+                onDelete={handleDeleteConfirm}
+                operationLoading={operationLoading}
+              />
+              <Pagination
+                pagination={pagination}
+                onPageChange={handlePageChange}
+              />
+            </>
           )}
         </Paper>
       </Container>
