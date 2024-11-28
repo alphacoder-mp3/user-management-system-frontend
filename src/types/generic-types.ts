@@ -52,6 +52,12 @@ export interface UsersState {
     delete: string | null;
   };
   error: string | null;
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalUsers: number;
+    pageSize: number;
+  };
 }
 
 export interface AuthState {
