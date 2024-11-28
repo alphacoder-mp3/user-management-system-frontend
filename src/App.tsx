@@ -7,6 +7,7 @@ import { store } from './store/store';
 import Login from './pages/login';
 import { Suspense, lazy } from 'react';
 const Dashboard = lazy(() => import('./components/dashboard'));
+import DashboardSkeleton from './components/dashboard-skeleton';
 import ProtectedRoute from './components/protected-routes';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistor } from './store/store';
@@ -23,8 +24,7 @@ function App() {
                 path="/dashboard"
                 element={
                   <ProtectedRoute>
-                    <Suspense fallback={<div>Loading...</div>}>
-                      {' '}
+                    <Suspense fallback={<DashboardSkeleton />}>
                       <Dashboard />
                     </Suspense>
                   </ProtectedRoute>
