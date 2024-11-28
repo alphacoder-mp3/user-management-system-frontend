@@ -141,7 +141,7 @@ const UserTable = ({
           <TableRow>
             <TableCell sx={{ fontWeight: 600 }}>Sr No.</TableCell>
             <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
-            <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
+            <TableCell sx={{ fontWeight: 600 }}>Username</TableCell>
             <TableCell align="right" sx={{ fontWeight: 600 }}>
               Actions
             </TableCell>

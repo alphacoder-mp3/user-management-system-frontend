@@ -176,7 +176,7 @@ const Login = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Email"
+                label="Username"
                 {...register('email')}
                 error={!!errors.email}
                 helperText={errors.email?.message}
