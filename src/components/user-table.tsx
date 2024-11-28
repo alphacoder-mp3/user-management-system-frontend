@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { Edit2, Trash2 } from 'lucide-react';
 import { UserTableProps } from '../types';
+import { breakInput } from '../utils/word-limit';
 
 const UserTable = ({
   users,
@@ -154,8 +155,10 @@ const UserTable = ({
               sx={{ '&:hover': { bgcolor: 'action.hover' } }}
             >
               <TableCell>{index + 1}</TableCell>
-              <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
-              <TableCell>{user.email}</TableCell>
+              <TableCell>
+                {breakInput(`${user.firstName} ${user.lastName}`, 30)}
+              </TableCell>
+              <TableCell>{breakInput(user.email, 30)}</TableCell>
               <TableCell align="right">
                 <IconButton
                   onClick={() => onEdit(user)}
