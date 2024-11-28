@@ -41,6 +41,8 @@ export interface UserTableProps {
     update: string | null;
     delete: string | null;
   };
+  currentPage: number;
+  pageSize: number;
 }
 
 export interface UsersState {

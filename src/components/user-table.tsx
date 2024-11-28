@@ -25,9 +25,15 @@ const UserTable = ({
   onEdit,
   onDelete,
   operationLoading,
+  currentPage,
+  pageSize,
 }: UserTableProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const getSerialNumber = (index: number) => {
+    return (currentPage - 1) * pageSize + index + 1;
+  };
 
   if (users.length === 0) {
     return (
@@ -40,7 +46,7 @@ const UserTable = ({
         }}
       >
         <Typography variant="body1" color="text.secondary">
-          No users found on this page. Add your first user to get started.
+          No users found. Add your first user to get started.
         </Typography>
       </Box>
     );
@@ -68,7 +74,7 @@ const UserTable = ({
                 }}
               >
                 <Typography variant="subtitle2" color="text.secondary">
-                  User #{index + 1}
+                  User #{getSerialNumber(index)}
                 </Typography>
                 <Box>
                   <IconButton
@@ -154,7 +160,7 @@ const UserTable = ({
               key={user.id}
               sx={{ '&:hover': { bgcolor: 'action.hover' } }}
             >
-              <TableCell>{index + 1}</TableCell>
+              <TableCell>{getSerialNumber(index)}</TableCell>
               <TableCell>
                 {breakInput(`${user.firstName} ${user.lastName}`, 30)}
               </TableCell>

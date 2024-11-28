@@ -15,6 +15,12 @@ const Pagination = ({ pagination, onPageChange }: PaginationProps) => {
   const startRange = (currentPage - 1) * pageSize + 1;
   const endRange = Math.min(currentPage * pageSize, totalUsers);
 
+  const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
+    if (page !== currentPage) {
+      onPageChange(page);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -37,13 +43,16 @@ const Pagination = ({ pagination, onPageChange }: PaginationProps) => {
       <MuiPagination
         count={totalPages}
         page={currentPage}
-        onChange={(_, page) => onPageChange(page)}
+        onChange={handlePageChange}
         color="primary"
         size={isMobile ? 'small' : 'medium'}
         sx={{
           order: { xs: 1, sm: 2 },
           '& .MuiPagination-ul': {
             justifyContent: 'center',
+          },
+          '& .Mui-selected': {
+            pointerEvents: 'none',
           },
         }}
       />

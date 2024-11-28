@@ -74,9 +74,9 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (token) {
-      fetchUsers(pagination.currentPage);
+      fetchUsers(1); // Initial fetch with page 1
     }
-  }, [fetchUsers, token, pagination.currentPage]);
+  }, [fetchUsers, token]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -101,7 +101,7 @@ const Dashboard = () => {
 
       if (error) return;
       if (newUser) {
-        await fetchUsers(1); // Refresh the first page after adding
+        await fetchUsers(pagination.currentPage); // Stay on current page after adding
         toast.success('User added successfully');
         setIsModalOpen(false);
       }
@@ -156,7 +156,6 @@ const Dashboard = () => {
 
       if (error) return;
 
-      // Refresh current page after deletion
       await fetchUsers(pagination.currentPage);
       toast.success('User deleted successfully');
     } finally {
@@ -256,6 +255,8 @@ const Dashboard = () => {
                 onEdit={openEditModal}
                 onDelete={handleDeleteConfirm}
                 operationLoading={operationLoading}
+                currentPage={pagination.currentPage}
+                pageSize={pagination.pageSize}
               />
               <Pagination
                 pagination={pagination}
